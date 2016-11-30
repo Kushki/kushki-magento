@@ -1,0 +1,12 @@
+{
+    "name": "kushki/kushkipayment",
+    "authors": [
+        {
+            "name": "joseSantacruz",
+            "email": "jose.santacruz@sillpacorp.com"
+        }
+    ],
+    "require": {
+    	"kushki/kushki-php": "^1.0.0"
+    }
+}
