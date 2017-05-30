@@ -16,8 +16,8 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 		$token        = $this->getRequest()->get( "kushkiToken" );
 		$meses        = $this->getRequest()->get( "kushkiDeferred" );
 		$total        = doubleval( $this->getRequest()->get( "grandTotal" ) );
-		$subtotalIva  = round( $total / 1.14, 2 );
-		$iva          = round( $total - ( $total / 1.14 ), 2 );
+		$subtotalIva  = round( $total / 1.12, 2 );
+		$iva          = round( $total - $subtotalIva, 2 );
 		$subtotalIva0 = 0.0;
 		$ice          = 0.0;
 		$monto        = new kushki\lib\Amount( $subtotalIva, $iva, $subtotalIva0, $ice );
