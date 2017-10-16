@@ -1,0 +1,5 @@
+kushkimagento:
+  build:
+    image: kushki/magento1.9
+    dockerfile: .dev-enviroment/Dockerfile
+  encrypted_env_file: env.encrypted

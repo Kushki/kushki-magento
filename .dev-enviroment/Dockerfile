@@ -12,12 +12,13 @@ RUN chown -R www-data:www-data /var/www/htdocs
 RUN apt-get update && apt-get install -y mysql-client-5.5 libxml2-dev
 RUN docker-php-ext-install soap
 
+COPY ./pipeline /opt/pipeline
 COPY ./bin/install-magento /usr/local/bin/install-magento
 RUN chmod +x /usr/local/bin/install-magento
 
 COPY ./sampledata/magento-sample-data-1.9.2.4.tar.gz /opt/
-    COPY ./bin/install-sampledata-1.9 /usr/local/bin/install-sampledata
-RUN chmod +x /usr/local/bin/install-sampledata
+COPY ./bin/install-sampledata-1.9 /usr/local/bin/install-sampledata
+RUN chmod +x /usr/local/bin/install-sampledata && chmod +x /opt/pipeline
 
 RUN bash -c 'bash < <(curl -s -L https://raw.github.com/colinmollenhour/modman/master/modman-installer)'
 RUN mv ~/bin/modman /usr/local/bin
