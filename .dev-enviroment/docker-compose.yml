@@ -6,10 +6,11 @@ web:
     - magento-mysql
   env_file:
     - env
+  volumes:
+    - ../Kushki:/tmp/local
 magento-mysql:
   image: mysql:5.6.23
   env_file:
     - env
-  volumes:
-    - ../Kushki:/tmp/local
+
 
