@@ -2,7 +2,7 @@
   steps:
     - name: printenv
       service: kushkimagento
-      command: ls /opt
+      command: "ls /opt"
     - name: build
       service: kushkimagento
       command: /opt/pipeline/01-install.sh
