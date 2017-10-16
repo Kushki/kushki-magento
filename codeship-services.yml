@@ -19,8 +19,7 @@ kushkimagento:
     - MAGENTO_ADMIN_USERNAME=kushki
     - MAGENTO_ADMIN_PASSWORD=Kushki123
 magento-mysql:
-  build:
-    image: mysql:5.6.23
+  image: mysql:5.6.23
   cached: true
   environment:
     - MYSQL_HOST=magento-mysql
