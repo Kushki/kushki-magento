@@ -1,8 +1,8 @@
 - type: serial
   steps:
     - name: printenv
-      service: magento-mysql
-      command: printenv
+      service: kushkimagento
+      command: ls /opt
     - name: build
       service: kushkimagento
       command: /opt/pipeline/01-install.sh
