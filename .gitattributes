@@ -1,2 +1,0 @@
-.dev-enviroment/sampledata/magento-sample-data-1.9.2.4.tar.gz filter=lfs diff=lfs merge=lfs -text
-*.gz filter=lfs diff=lfs merge=lfs -text

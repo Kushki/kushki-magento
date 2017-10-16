@@ -1,7 +1,7 @@
 kushkimagento:
   build:
     image: kushki/magento1.9
-    dockerfile: .dev-enviroment/Dockerfile
+    dockerfile: dev-environment/Dockerfile
   cached: true
   environment:
     - MYSQL_HOST=magento-mysql
@@ -21,7 +21,6 @@ kushkimagento:
 magento-mysql:
   build:
     image: mysql:5.6.23
-    dockerfile: .dev-enviroment/Dockerfile
   cached: true
   environment:
     - MYSQL_HOST=magento-mysql
