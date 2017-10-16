@@ -2,10 +2,10 @@
   steps:
     - name: build
       service: kushkimagento
-      command: /.dev-enviroment/pipeline/01-install.sh
+      command: .dev-enviroment/pipeline/01-install.sh
     - name: unit
       service: kushkimagento
-      command: /.dev-enviroment/pipeline/02-unit.sh
+      command: .dev-enviroment/pipeline/02-unit.sh
     - name: integration
       service: kushkimagento
-      command: /.dev-enviroment/pipeline/03-integration.sh
+      command: .dev-enviroment/pipeline/03-integration.sh
