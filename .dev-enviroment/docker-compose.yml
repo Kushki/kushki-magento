@@ -3,7 +3,7 @@ web:
   ports:
     - "80:80"
   links:
-    - mysql
+    - magento-mysql
   env_file:
     - env
 magento-mysql:
