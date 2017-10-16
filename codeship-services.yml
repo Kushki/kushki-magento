@@ -4,10 +4,10 @@ kushkimagento:
     dockerfile: dev-environment/Dockerfile
   cached: true
   links:
-    - magento-mysql
+    - magentomysql
   env_file:
     - dev-environment/env
-magento-mysql:
+magentomysql:
   image: mysql:5.6.23
   cached: true
   env_file:
