@@ -1,0 +1,23 @@
+
+cd /tmp
+cp /opt/magento-sample-data-1.9.2.4.tar.gz .
+tar xvf magento-sample-data-1.9.2.4.tar.gz
+cp -R magento-sample-data-1.9.2.4/media/* /var/www/htdocs/media/
+cp -R magento-sample-data-1.9.2.4/skin/* /var/www/htdocs/skin/
+chown -R www-data:www-data /var/www/htdocs/media
+
+mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < /tmp/magento-sample-data-1.9.2.4/magento_sample_data_for_1.9.2.4.sql
+mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e  "LOCK TABLES admin_role WRITE , admin_user WRITE
+;SET @SALT = 'rp'
+;SET @PASS = CONCAT(MD5(CONCAT( @SALT , 'admin123') ), CONCAT(':', @SALT ))
+;SELECT @EXTRA := MAX(extra) FROM admin_user WHERE extra IS NOT NULL
+;INSERT INTO admin_user (firstname,lastname,email,username,password,created,lognum,reload_acl_flag,is_active,extra,rp_token_created_at) VALUES ('Firstname','Lastname','email@example.com','admin',@PASS,NOW(),0,0,1,@EXTRA,NOW())
+;INSERT INTO admin_role (parent_id,tree_level,sort_order,role_type,user_id,role_name) VALUES (1,2,0,'U',(SELECT user_id FROM admin_user WHERE username = 'admin'),'Firstname')
+;UNLOCK TABLES;"
+
+mkdir  /var/www/htdocs/app/code/local
+ln -s  /tmp/local/Kushki /var/www/htdocs/app/code/local/Kushki
+ln -s  /tmp/local/Hackathon /var/www/htdocs/app/code/community/Hackathon
+ln -s  /tmp/local/kushkipayment /var/www/htdocs/app/design/frontend/base/default/template/kushkipayment
+ln -s  /tmp/local/Kushki_All.xml /var/www/htdocs/app/etc/modules/Kushki_All.xml
+ln -s  /tmp/local/Hackathon_PSR0Autoloader.xml /var/www/htdocs/app/etc/modules/Hackathon_PSR0Autoloader.xml
