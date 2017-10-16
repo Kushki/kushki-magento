@@ -3,6 +3,8 @@ kushkimagento:
     image: kushki/magento1.9
     dockerfile: dev-environment/Dockerfile
   cached: true
+  links:
+    - magento-mysql
   environment:
     - MYSQL_HOST=magento-mysql
     - MYSQL_ROOT_PASSWORD=magento
