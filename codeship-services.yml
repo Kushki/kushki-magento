@@ -10,9 +10,5 @@ kushkimagento:
 magento-mysql:
   image: mysql:5.6.23
   cached: true
-  environment:
-    MYSQL_HOST: magento-mysql
-    MYSQL_ROOT_PASSWORD: magento
-    MYSQL_USER: magento
-    MYSQL_PASSWORD: magento
-    MYSQL_DATABASE: magento
+  env_file:
+    - dev-environment/env
