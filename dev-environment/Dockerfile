@@ -7,10 +7,7 @@ RUN cd /tmp && \
     tar xvf $MAGENTO_VERSION.tar.gz && \
     mv magento-mirror-$MAGENTO_VERSION/* magento-mirror-$MAGENTO_VERSION/.htaccess /var/www/htdocs
 
-RUN chown -R www-data:www-data /var/www/htdocs
-
-RUN apt-get update && apt-get install -y mysql-client-5.5 libxml2-dev
-RUN docker-php-ext-install soap
+RUN chown -R www-data:www-data /var/www/htdocs &&  apt-get update && apt-get install -y mysql-client-5.5 libxml2-dev && docker-php-ext-install soap
 
 COPY ./dev-environment/pipeline /opt/pipeline
 COPY ./dev-environment/bin/install-magento /usr/local/bin/install-magento
@@ -18,9 +15,7 @@ RUN chmod +x /usr/local/bin/install-magento
 
 COPY ./dev-environment/sampledata/magento-sample-data-1.9.2.4.tar.gz /opt/
 COPY ./dev-environment/bin/install-sampledata-1.9 /usr/local/bin/install-sampledata
-RUN chmod +x /usr/local/bin/install-sampledata && chmod -R +x /opt/pipeline
-
-RUN bash -c 'bash < <(curl -s -L https://raw.github.com/colinmollenhour/modman/master/modman-installer)' && mv ~/bin/modman /usr/local/bin && tar xvf /opt/magento-sample-data-1.9.2.4.tar.gz -C /tmp/
+RUN chmod +x /usr/local/bin/install-sampledata && chmod -R +x /opt/pipeline &&  bash -c 'bash < <(curl -s -L https://raw.github.com/colinmollenhour/modman/master/modman-installer)' && mv ~/bin/modman /usr/local/bin && tar xvf /opt/magento-sample-data-1.9.2.4.tar.gz -C /tmp/
 #RUN install-magento
 #RUN install-sample
 VOLUME /var/www/htdocs
