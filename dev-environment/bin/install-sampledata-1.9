@@ -1,8 +1,7 @@
 #!/bin/bash
 cd /tmp
-cp /opt/magento-sample-data-1.9.2.4.tar.gz ./magento-sample-data-1.9.2.4.tar.gz
-gunzip /tmp/magento-sample-data-1.9.2.4.tar.gz
-tar xvf /tmp/magento-sample-data-1.9.2.4.tar -C /tmp/
+cp /opt/magento-sample-data-1.9.2.4.tar.gz /tmp/magento-sample-data-1.9.2.4.tar.gz
+tar xvf /tmp/magento-sample-data-1.9.2.4.tar.gz -C /tmp/
 cp -R /tmp/magento-sample-data-1.9.2.4/media/* /var/www/htdocs/media/
 cp -R /tmp/magento-sample-data-1.9.2.4/skin/* /var/www/htdocs/skin/
 chown -R www-data:www-data /var/www/htdocs/media
