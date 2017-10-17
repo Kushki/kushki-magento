@@ -16,8 +16,6 @@ COPY ./dev-environment/bin/install-sampledata-1.9 /usr/local/bin/install-sampled
 RUN chmod +x /usr/local/bin/install-magento && chmod +x /usr/local/bin/install-sampledata && chmod -R +x /opt/pipeline && \
  bash -c 'bash < <(curl -s -L https://raw.github.com/colinmollenhour/modman/master/modman-installer)' && \
    tar xvf /opt/magento-sample-data-1.9.2.4.tar.gz -C /tmp/; exit 0 && mv ~/bin/modman /usr/local/bin
-#RUN install-magento
-#RUN install-sample
 VOLUME /var/www/htdocs
 RUN sed -i 's/DocumentRoot \/var\/www\/html/DocumentRoot \/var\/www\/htdocs/' /etc/apache2/sites-available/000-default.conf
 RUN sed -i 's/DocumentRoot \/var\/www\/html/DocumentRoot \/var\/www\/htdocs/' /etc/apache2/sites-available/default-ssl.conf
