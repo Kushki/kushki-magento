@@ -1,11 +1,9 @@
 #!/bin/bash
 cd /tmp
-ls /opt
 cp /opt/magento-sample-data-1.9.2.4.tar.gz ./magento-sample-data-1.9.2.4.tar
-ls /tmp
-tar xf magento-sample-data-1.9.2.4.tar -C /tmp/
-cp -R magento-sample-data-1.9.2.4/media/* /var/www/htdocs/media/
-cp -R magento-sample-data-1.9.2.4/skin/* /var/www/htdocs/skin/
+tar xf /tmp/magento-sample-data-1.9.2.4.tar -C /tmp/
+cp -R /tmp/magento-sample-data-1.9.2.4/media/* /var/www/htdocs/media/
+cp -R /tmp/magento-sample-data-1.9.2.4/skin/* /var/www/htdocs/skin/
 chown -R www-data:www-data /var/www/htdocs/media
 
 mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < /tmp/magento-sample-data-1.9.2.4/magento_sample_data_for_1.9.2.4.sql
