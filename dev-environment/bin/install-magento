@@ -3,4 +3,4 @@ php -f /var/www/htdocs/install.php -- --license_agreement_accepted "yes" --local
 # uncomment to configure magento to use redis cache
 #sed -i 's/<active>false/<active>true/' app/etc/modules/Cm_RedisSession.xml
 #sed -i -e '/<session_save><!\[CDATA\[files\]\]><\/session_save>/{r app/etc/redis.conf' -e 'd}' app/etc/local.xml
-mv /var/www/htdocs/errors/local.xml.sample /var/www/htdocs/errors/local.xml
+#mv /var/www/htdocs/errors/local.xml.sample /var/www/htdocs/errors/local.xml
