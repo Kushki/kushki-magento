@@ -6,9 +6,13 @@
  * Time: 5:43 PM
  */
 
-use PHPUnit_Framework_TestCase;
+//require_once '../vendor/Autoload.php';
 
-class ExampleTest extends PHPUnit_Framework_TestCase
+class ExampleTest extends PHPUnit\Framework\TestCase
 {
 
+    public function testBasicTest()
+    {
+        $this->assertTrue(true);
+    }
 }
