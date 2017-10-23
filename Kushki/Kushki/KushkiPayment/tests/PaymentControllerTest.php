@@ -9,19 +9,19 @@
 use PHPUnit_Framework_TestCase;
 
 class PaymentControllerTest extends PHPUnit_Framework_TestCase {
-    public function testGetTaxRules() {
+    public function testGetTaxDetails() {
         $expectedResult = array(
             [
-                "tax_calculation_rule_id"=>"4",
-                "code"=>"Retail Customer - Taxable Good - Rate 1",
-                "priority"=>"1",
-                "position"=>"0",
-                "calculate_subtotal"=>"0"
+                'productId' => '1',
+                'price' => '280',
+                'totalTax' => '12',
+                'quantity' => '1',
+                'tax' => ['4', '6']
             ]);
 
         $stub = $this->createMock(Kushki_KushkiPayment_PaymentController::class);
-        $stub->method('getTaxRules')
+        $stub->method('getTaxDetails')
             ->willReturn($expectedResult);
-        $this->assertEquals($expectedResult, $stub->getTaxRules());
+        $this->assertEquals($expectedResult, $stub->getTaxDetails());
     }
 }

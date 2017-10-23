@@ -10,9 +10,8 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 			$entorno = kushki\lib\KushkiEnvironment::PRODUCTION;
 		}
 
-        $orderId = $this->getRequest()->get( "orderId" );
-        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId)->getData();
         $orderItems = $this->getProducts();
+
         $iva = 0.0;
         $subtotalIva0 = 0.0;
         $subtotalIva = 0.0;
@@ -25,7 +24,6 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
             }
         }
 
-        $collection = $this->getTaxRules();
 		$kushki = new kushki\lib\Kushki( $merchantId, $idioma, $moneda, $entorno );
 
 		$token        = $this->getRequest()->get( "kushkiToken" );
@@ -37,9 +35,9 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 		$monto        = new kushki\lib\Amount( $subtotalIva, $iva, $subtotalIva0, $ice );
 
 		if ( $meses > 0 ) {
-			$transaccion = $kushki->deferredCharge( $token, $monto, $meses, $order);
+			$transaccion = $kushki->deferredCharge( $token, $monto, $meses);
 		} else {
-			$transaccion = $kushki->charge( $token, $monto, $order);
+			$transaccion = $kushki->charge( $token, $monto, $orderItems);
 		}
 		if ( $this->getRequest()->get( "orderId" ) && $transaccion->isSuccessful() ) {
 			$arr_querystring = array(
@@ -80,21 +78,6 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 		}
 	}
 
-	public function getTaxRules(){
-        //     collection is an array that has all the tax rules Todo erase comment in the KV-2059
-//     each element in the array has tax_calculation_rule_id, code, priority, position and calculate_subtotal
-        $collection = Mage::getModel('tax/calculation_rule')->getCollection()->getData();
-        $collection = array_filter($collection);
-
-        if (!empty($collection)) {
-            foreach($collection as $rule) {
-                echo('');
-            }
-            return $collection;
-        }
-        return false;
-    }
-
     public function getProducts(){
         $orderId = $this->getRequest()->get( "orderId" );
         $order = Mage::getModel('sales/order')->load($orderId, 'increment_id');
@@ -102,5 +85,39 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
             ->addAttributeToSelect('*')
             ->load();
         return $orderItems->getData();
+    }
+
+    public function getTaxDetails(){
+        $orderId = $this->getRequest()->get( "orderId" );
+        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
+        $orderItems = $this->getProducts();
+        $arrResp = array();
+        $cont = 0;
+        foreach ($orderItems as $item){
+            $product = Mage::getModel('catalog/product')->load($item['product_id']);
+            $productTaxClassId = $product->getTaxClassId();
+            $customerGroupId = $order['customer_group_id'];
+            $customerTaxClassId = Mage::getModel('customer/group')->load($customerGroupId)['tax_class_id'];
+            $taxCalculation = Mage::getModel('tax/calculation')->getCollection()
+                ->addFieldToFilter('product_tax_class_id', $productTaxClassId)
+                ->addFieldToFilter('customer_tax_class_id',$customerTaxClassId)->getData();
+            $arrCal = array();
+            $contCal = 0;
+            foreach ($taxCalculation as $calculation){
+                $arrCal[$contCal] = [
+                    $calculation['tax_calculation_rate_id']
+                ];
+                $contCal++;
+            }
+            $arrResp[$cont] = [
+                'productId' => $item['product_id'],
+                'price' => $item['base_price'],
+                'totalTax' => $item['tax_percent'],
+                'quantity' => $item['qty_ordered'],
+                'tax' => $arrCal
+            ];
+            $cont++;
+        }
+        return $arrResp;
     }
 }
