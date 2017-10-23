@@ -17,11 +17,11 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
         $subtotalIva0 = 0.0;
         $subtotalIva = 0.0;
         foreach ($orderItems as $item){
-            if($item->tax_amount > 0){
-                $subtotalIva += $item->price;
-                $iva += $item->tax_amount;
+            if($item['tax_amount'] > 0){
+                $subtotalIva += $item['price'];
+                $iva += $item['tax_amount'];
             }else {
-                $subtotalIva0 += $item->price;
+                $subtotalIva0 += $item['price'];
             }
         }
 
@@ -30,7 +30,6 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 
 		$token        = $this->getRequest()->get( "kushkiToken" );
 		$meses        = $this->getRequest()->get( "kushkiDeferred" );
-//		$total        = doubleval( $this->getRequest()->get( "grandTotal" ) );
 		$subtotalIva  = round( $subtotalIva, 2 );
 		$iva          = round( $iva, 2 );
         $subtotalIva0 = round( $subtotalIva0, 2 );
@@ -101,7 +100,6 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
         $order = Mage::getModel('sales/order')->load($orderId, 'increment_id');
         $orderItems = $order->getItemsCollection()
             ->addAttributeToSelect('*')
-            ->addAttributeToFilter('product_type', array('eq'=>'simple'))
             ->load();
         return $orderItems->getData();
     }
