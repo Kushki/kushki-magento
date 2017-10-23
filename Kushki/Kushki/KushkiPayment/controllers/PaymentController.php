@@ -10,22 +10,37 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 			$entorno = kushki\lib\KushkiEnvironment::PRODUCTION;
 		}
 
+        $orderId = $this->getRequest()->get( "orderId" );
+        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId)->getData();
+        $orderItems = $this->getProducts();
+        $iva = 0.0;
+        $subtotalIva0 = 0.0;
+        $subtotalIva = 0.0;
+        foreach ($orderItems as $item){
+            if($item->tax_amount > 0){
+                $subtotalIva += $item->price;
+                $iva += $item->tax_amount;
+            }else {
+                $subtotalIva0 += $item->price;
+            }
+        }
+
         $collection = $this->getTaxRules();
 		$kushki = new kushki\lib\Kushki( $merchantId, $idioma, $moneda, $entorno );
 
 		$token        = $this->getRequest()->get( "kushkiToken" );
 		$meses        = $this->getRequest()->get( "kushkiDeferred" );
-		$total        = doubleval( $this->getRequest()->get( "grandTotal" ) );
-		$subtotalIva  = round( $total / 1.12, 2 );
-		$iva          = round( $total - $subtotalIva, 2 );
-		$subtotalIva0 = 0.0;
+//		$total        = doubleval( $this->getRequest()->get( "grandTotal" ) );
+		$subtotalIva  = round( $subtotalIva, 2 );
+		$iva          = round( $iva, 2 );
+        $subtotalIva0 = round( $subtotalIva0, 2 );
 		$ice          = 0.0;
 		$monto        = new kushki\lib\Amount( $subtotalIva, $iva, $subtotalIva0, $ice );
 
 		if ( $meses > 0 ) {
-			$transaccion = $kushki->deferredCharge( $token, $monto, $meses );
+			$transaccion = $kushki->deferredCharge( $token, $monto, $meses, $order);
 		} else {
-			$transaccion = $kushki->charge( $token, $monto);
+			$transaccion = $kushki->charge( $token, $monto, $order);
 		}
 		if ( $this->getRequest()->get( "orderId" ) && $transaccion->isSuccessful() ) {
 			$arr_querystring = array(
@@ -74,10 +89,20 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 
         if (!empty($collection)) {
             foreach($collection as $rule) {
-                echo($rule);
+                echo('');
             }
             return $collection;
         }
         return false;
+    }
+
+    public function getProducts(){
+        $orderId = $this->getRequest()->get( "orderId" );
+        $order = Mage::getModel('sales/order')->load($orderId, 'increment_id');
+        $orderItems = $order->getItemsCollection()
+            ->addAttributeToSelect('*')
+            ->addAttributeToFilter('product_type', array('eq'=>'simple'))
+            ->load();
+        return $orderItems->getData();
     }
 }
