@@ -3,12 +3,12 @@ web:
   ports:
     - "80:80"
   links:
-    - magento-mysql
+    - magentomysql
   env_file:
     - env
   volumes:
     - ../Kushki:/tmp/local
-magento-mysql:
+magentomysql:
   image: mysql:5.6.23
   env_file:
     - env

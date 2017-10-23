@@ -10,7 +10,7 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 			$entorno = kushki\lib\KushkiEnvironment::PRODUCTION;
 		}
 
-
+        $collection = $this->getTaxRules();
 		$kushki = new kushki\lib\Kushki( $merchantId, $idioma, $moneda, $entorno );
 
 		$token        = $this->getRequest()->get( "kushkiToken" );
@@ -25,7 +25,7 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 		if ( $meses > 0 ) {
 			$transaccion = $kushki->deferredCharge( $token, $monto, $meses );
 		} else {
-			$transaccion = $kushki->charge( $token, $monto );
+			$transaccion = $kushki->charge( $token, $monto);
 		}
 		if ( $this->getRequest()->get( "orderId" ) && $transaccion->isSuccessful() ) {
 			$arr_querystring = array(
@@ -65,4 +65,19 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 			Mage_Core_Controller_Varien_Action::_redirect( 'checkout/onepage/error', array( '_secure' => false ) );
 		}
 	}
+
+	public function getTaxRules(){
+        //     collection is an array that has all the tax rules Todo erase comment in the KV-2059
+//     each element in the array has tax_calculation_rule_id, code, priority, position and calculate_subtotal
+        $collection = Mage::getModel('tax/calculation_rule')->getCollection()->getData();
+        $collection = array_filter($collection);
+
+        if (!empty($collection)) {
+            foreach($collection as $rule) {
+                echo($rule);
+            }
+            return $collection;
+        }
+        return false;
+    }
 }
