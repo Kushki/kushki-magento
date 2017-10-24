@@ -1,5 +1,6 @@
 <?php
 
+include_once 'PaymentControllerKushki.php';
 use kushki\lib\ExtraTaxes;
 
 class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_Action {
@@ -12,12 +13,21 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 		if ( ! Mage::getStoreConfig( 'payment/kushkipayment/testing' ) ) {
 			$entorno = kushki\lib\KushkiEnvironment::PRODUCTION;
 		}
-        $orderItems = $this->getProducts();
+        $tax_iva = Mage::getStoreConfig('payment/kushkipayment/taxiva');
+        $tax_ice = Mage::getStoreConfig('payment/kushkipayment/taxice');
+        $tax_propina = Mage::getStoreConfig('payment/kushkipayment/taxpropina');
+        $tax_tasa_aeroportuaria = Mage::getStoreConfig('payment/kushkipayment/taxaeroportuaria');
+        $tax_agencia_viaje = Mage::getStoreConfig('payment/kushkipayment/taxagenciadeviaje');
+        $tax_iac = Mage::getStoreConfig('payment/kushkipayment/taxiac');
+
         $countryCode = Mage::getStoreConfig('general/country/default');
         $orderId = $this->getRequest()->get( "orderId" );
-        $order = Mage::getModel('sales/order')->load($orderId, 'increment_id')->getData();
-        $taxCalculation = $this->getTaxDetails();
-		$taxes = $this->getTaxAmount($taxCalculation, $orderId);
+        $order = Mage::getModel('sales/order')->load($orderId, 'increment_id');
+        $kushkiPaymentController = new PaymentControllerKushki($orderId, $order, $tax_iva, $tax_ice, $tax_propina, $tax_tasa_aeroportuaria, $tax_agencia_viaje, $tax_iac);
+        $taxCalculation = $kushkiPaymentController->getTaxDetails();
+        //$taxCalculation = $this->getTaxDetails();
+        $taxes = $kushkiPaymentController->getTaxAmount($taxCalculation, $orderId);
+		//$taxes = $this->getTaxAmount($taxCalculation, $orderId);
 		$kushki = new kushki\lib\Kushki( $merchantId, $idioma, $moneda, $entorno );
 
 		if ( (float)$order['base_shipping_tax_amount'] > 0 ){
@@ -48,7 +58,7 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 		} else {
 			$transaccion = $kushki->charge( $token, $monto);
             //TODO[@pmoreanoj] uncomment when metadata is getting decrypted in Aurus
-            //$transaccion = $kushki->charge( $token, $monto, $order);
+            //$transaccion = $kushki->charge( $token, $monto, $order->getData());
 		}
 		if ( $this->getRequest()->get( "orderId" ) && $transaccion->isSuccessful() ) {
 			$arr_querystring = array(
@@ -88,121 +98,4 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 			Mage_Core_Controller_Varien_Action::_redirect( 'checkout/onepage/error', array( '_secure' => false ) );
 		}
 	}
-
-    public function getProducts(){
-        $orderId = $this->getRequest()->get( "orderId" );
-        $order = Mage::getModel('sales/order')->load($orderId, 'increment_id');
-        $orderItems = $order->getItemsCollection()
-            ->addAttributeToSelect('*')
-            ->load();
-        return $orderItems->getData();
-    }
-
-    public function getTaxDetails(){
-        $orderId = $this->getRequest()->get( "orderId" );
-        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
-        $orderItems = $this->getProducts();
-        $arrResp = array();
-        $cont = 0;
-        foreach ($orderItems as $item){
-            $product = Mage::getModel('catalog/product')->load($item['product_id']);
-            $productTaxClassId = $product->getTaxClassId();
-            $customerGroupId = $order['customer_group_id'];
-            $customerTaxClassId = Mage::getModel('customer/group')->load($customerGroupId)['tax_class_id'];
-            $taxCalculation = Mage::getModel('tax/calculation')->getCollection()
-                ->addFieldToFilter('product_tax_class_id', $productTaxClassId)
-                ->addFieldToFilter('customer_tax_class_id',$customerTaxClassId)->getData();
-            $arrCal = array();
-            $contCal = 0;
-            foreach ($taxCalculation as $calculation){
-                $arrCal[$contCal] = [
-                    $calculation['tax_calculation_rate_id']
-                ];
-                $contCal++;
-            }
-            $arrResp[$cont] = [
-                'productId' => $item['product_id'],
-                'price' => $item['base_price'],
-                'totalTax' => $item['tax_percent'],
-                'quantity' => $item['qty_ordered'],
-                'tax' => $arrCal
-            ];
-            $cont++;
-        }
-        return $arrResp;
-
-    }
-
-    public function getTaxAmount($productTaxes, $orderId)
-    {
-        $tax_iva = Mage::getStoreConfig('payment/kushkipayment/taxiva');
-        $tax_ice = Mage::getStoreConfig('payment/kushkipayment/taxice');
-        $tax_propina = Mage::getStoreConfig('payment/kushkipayment/taxpropina');
-        $tax_tasa_aeroportuaria = Mage::getStoreConfig('payment/kushkipayment/taxaeroportuaria');
-        $tax_agencia_viaje = Mage::getStoreConfig('payment/kushkipayment/taxagenciadeviaje');
-        $tax_iac = Mage::getStoreConfig('payment/kushkipayment/taxiac');
-        $subtotalIva = 0;
-        $subtotalIva0 = 0;
-        $iva = 0;
-        $ice = 0;
-        $propina = null;
-        $tasaAeroportuaria = null;
-        $agenciaDeViaje = null;
-        $iac = null;
-        $i = 0;
-
-        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
-        $countryId = $order->getShippingAddress()->getData()['country_id'];
-        foreach($productTaxes as $product){
-            $totalAmount = $product['price'];
-            $taxExcempt = true;
-            foreach($product['tax'] as $tax){
-                $taxCalculation = Mage::getModel('tax/calculation_rate')->getCollection()
-                    ->addFieldToFilter('tax_country_id', $countryId)
-                    ->addFieldToFilter('tax_calculation_rate_id', $tax[$i])->getData();
-                if($taxCalculation != null && $taxCalculation[0]['code'] != null) {
-                    $percentage = $taxCalculation[0]['rate'];
-                    $taxName = $taxCalculation[0]['code'];
-                    switch ($taxName) {
-                        case $tax_iva:
-                            $iva += (($totalAmount * $percentage) / 100) * $product['quantity'];
-                            $subtotalIva += $totalAmount * $product['quantity'];
-                            $taxExcempt = false;
-                            break;
-                        case $tax_ice:
-                            $ice += (($totalAmount * $percentage) / 100) * $product['quantity'];
-                            break;
-                        case $tax_propina:
-                            $propina += (($totalAmount * $percentage) / 100) * $product['quantity'];
-                            break;
-                        case $tax_tasa_aeroportuaria:
-                            $tasaAeroportuaria += (($totalAmount * $percentage) / 100) * $product['quantity'];
-                            break;
-                        case $tax_agencia_viaje:
-                            $agenciaDeViaje += (($totalAmount * $percentage) / 100) * $product['quantity'];
-                            break;
-                        case $tax_iac:
-                            $iac += (($totalAmount * $percentage) / 100) * $product['quantity'];
-                            break;
-                    }
-                }
-            }
-            if ($taxExcempt){
-                $subtotalIva0 += $totalAmount * $product['quantity'];
-            }
-        }
-        $amount = [
-            'subtotalIva' => $subtotalIva,
-            'subtotalIva0' => $subtotalIva0,
-            'iva' => $iva,
-            'ice' => $ice,
-            'extraTaxes' => [
-                'propina' => $propina,
-                'tasaAeroportuaria' => $tasaAeroportuaria,
-                'agenciaDeViaje' => $agenciaDeViaje,
-                'iac' => $iac
-            ]
-        ];
-        return $amount;
-    }
 }
