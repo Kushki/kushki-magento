@@ -12,11 +12,11 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 		if ( ! Mage::getStoreConfig( 'payment/kushkipayment/testing' ) ) {
 			$entorno = kushki\lib\KushkiEnvironment::PRODUCTION;
 		}
-
         $orderItems = $this->getProducts();
         $countryCode = Mage::getStoreConfig('general/country/default');
         $orderId = $this->getRequest()->get( "orderId" );
-		$taxCalculation = $this->getTaxDetails();
+        $order = Mage::getModel('sales/order')->load($orderId, 'increment_id');
+        $taxCalculation = $this->getTaxDetails();
 		$taxes = $this->getTaxAmount($taxCalculation, $orderId);
 		$kushki = new kushki\lib\Kushki( $merchantId, $idioma, $moneda, $entorno );
 
@@ -25,18 +25,23 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 //		$subtotalIva  = round( $subtotalIva, 2 );
 //		$iva          = round( $iva, 2 );
 //      $subtotalIva0 = round( $subtotalIva0, 2 );
-
         if($countryCode == 'CO'){
-            $monto = new kushki\lib\Amount( $taxes['subtotalIva'], $taxes['iva'], $taxes['subtotalIva0'], $taxes['extraTaxes'] );
+            $extraTaxes =
+                new kushki\lib\ExtraTaxes($taxes['extraTaxes']['propina'], $taxes['extraTaxes']['tasaAeroportuaria'],
+                    $taxes['extraTaxes']['agenciaDeViaje'], $taxes['extraTaxes']['iac']);
+            $monto = new kushki\lib\Amount( $taxes['subtotalIva'], $taxes['iva'], $taxes['subtotalIva0'], $extraTaxes );
         }
-        if($countryCode == 'US'){
+        else {
             $monto = new kushki\lib\Amount( $taxes['subtotalIva'], $taxes['iva'], $taxes['subtotalIva0'], $taxes['ice'] );
         }
+
 
 		if ( $meses > 0 ) {
 			$transaccion = $kushki->deferredCharge( $token, $monto, $meses);
 		} else {
 			$transaccion = $kushki->charge( $token, $monto);
+            //TODO[@pmoreanoj] uncomment when metadata is getting decrypted in Aurus
+            //$transaccion = $kushki->charge( $token, $monto, $order->getData());
 		}
 		if ( $this->getRequest()->get( "orderId" ) && $transaccion->isSuccessful() ) {
 			$arr_querystring = array(
@@ -124,14 +129,11 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
     public function getTaxAmount($productTaxes, $orderId)
     {
         $tax_iva = Mage::getStoreConfig('payment/kushkipayment/taxiva');
-
-
         $tax_ice = Mage::getStoreConfig('payment/kushkipayment/taxice');
         $tax_propina = Mage::getStoreConfig('payment/kushkipayment/taxpropina');
         $tax_tasa_aeroportuaria = Mage::getStoreConfig('payment/kushkipayment/taxaeroportuaria');
         $tax_agencia_viaje = Mage::getStoreConfig('payment/kushkipayment/taxagenciadeviaje');
         $tax_iac = Mage::getStoreConfig('payment/kushkipayment/taxiac');
-
         $subtotalIva = 0;
         $subtotalIva0 = 0;
         $iva = 0;
@@ -161,26 +163,25 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
                             $taxExcempt = false;
                             break;
                         case $tax_ice:
-                            $ice += $totalAmount * $percentage * $product->quantity;
+                            $ice += (($totalAmount * $percentage) / 100) * $product['quantity'];
                             break;
                         case $tax_propina:
-                            $propina += $totalAmount * $percentage * $product->quantity;
+                            $propina += (($totalAmount * $percentage) / 100) * $product['quantity'];
                             break;
                         case $tax_tasa_aeroportuaria:
-                            $tasaAeroportuaria += $totalAmount * $percentage * $product->quantity;
+                            $tasaAeroportuaria += (($totalAmount * $percentage) / 100) * $product['quantity'];
                             break;
                         case $tax_agencia_viaje:
-                            $agenciaDeViaje += $totalAmount * $percentage * $product->quantity;
+                            $agenciaDeViaje += (($totalAmount * $percentage) / 100) * $product['quantity'];
                             break;
                         case $tax_iac:
-                            $iac += $totalAmount * $percentage * $product->quantity;
+                            $iac += (($totalAmount * $percentage) / 100) * $product['quantity'];
                             break;
                     }
                 }
-                $i ++;
             }
             if ($taxExcempt){
-                $subtotalIva0 += $totalAmount * $product->quantity;
+                $subtotalIva0 += $totalAmount * $product['quantity'];
             }
         }
         $amount = [
