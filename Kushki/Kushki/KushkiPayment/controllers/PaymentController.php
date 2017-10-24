@@ -6,7 +6,8 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 	public function gatewayAction() {
 		$merchantId = Mage::helper( 'core' )->decrypt( Mage::getStoreConfig( 'payment/kushkipayment/commerceprivate' ) );
 		$idioma     = kushki\lib\KushkiLanguage::ES;
-		$moneda     = kushki\lib\KushkiCurrency::USD;
+        $moneda     = Mage::app()->getStore()->getCurrentCurrencyCode() == 'USD'? kushki\lib\KushkiCurrency::USD : kushki\lib\KushkiCurrency::COP;
+//		$moneda     = kushki\lib\KushkiCurrency::USD;
 		$entorno    = kushki\lib\KushkiEnvironment::TESTING;
 		if ( ! Mage::getStoreConfig( 'payment/kushkipayment/testing' ) ) {
 			$entorno = kushki\lib\KushkiEnvironment::PRODUCTION;

@@ -3,6 +3,7 @@ $order = new Mage_Sales_Model_Order();
 $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
 $order->loadByIncrementId($orderId);
 $publicId = Mage::helper('core')->decrypt(Mage::getStoreConfig('payment/kushkipayment/commercepublic'));
+$currencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
 $environment = Mage::getStoreConfig('payment/kushkipayment/testing');
 ?>
 <h2>Kushki</h2>
@@ -19,6 +20,7 @@ $environment = Mage::getStoreConfig('payment/kushkipayment/testing');
         "form" : 'kushki-kushkipayment-form',
         "merchant_id" : '<? echo $publicId; ?>',
         "amount" : '<? echo number_format($order->base_grand_total,2); ?>',
-        "is_subscription": false
+        "is_subscription": false,
+        "currency": '<?php echo $currencyCode?>'
     });
 </script>
