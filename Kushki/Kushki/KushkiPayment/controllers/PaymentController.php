@@ -1,5 +1,7 @@
 <?php
 
+use kushki\lib\ExtraTaxes;
+
 class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_Action {
 	public function gatewayAction() {
 		$merchantId = Mage::helper( 'core' )->decrypt( Mage::getStoreConfig( 'payment/kushkipayment/commerceprivate' ) );
@@ -11,33 +13,29 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 		}
 
         $orderItems = $this->getProducts();
-
-        $iva = 0.0;
-        $subtotalIva0 = 0.0;
-        $subtotalIva = 0.0;
-        foreach ($orderItems as $item){
-            if($item['tax_amount'] > 0){
-                $subtotalIva += $item['price'];
-                $iva += $item['tax_amount'];
-            }else {
-                $subtotalIva0 += $item['price'];
-            }
-        }
-
+        $countryCode = Mage::getStoreConfig('general/country/default');
+        $orderId = $this->getRequest()->get( "orderId" );
+		$taxCalculation = $this->getTaxDetails();
+		$taxes = $this->getTaxAmount($taxCalculation, $orderId);
 		$kushki = new kushki\lib\Kushki( $merchantId, $idioma, $moneda, $entorno );
 
 		$token        = $this->getRequest()->get( "kushkiToken" );
 		$meses        = $this->getRequest()->get( "kushkiDeferred" );
-		$subtotalIva  = round( $subtotalIva, 2 );
-		$iva          = round( $iva, 2 );
-        $subtotalIva0 = round( $subtotalIva0, 2 );
-		$ice          = 0.0;
-		$monto        = new kushki\lib\Amount( $subtotalIva, $iva, $subtotalIva0, $ice );
+//		$subtotalIva  = round( $subtotalIva, 2 );
+//		$iva          = round( $iva, 2 );
+//      $subtotalIva0 = round( $subtotalIva0, 2 );
+
+        if($countryCode == 'CO'){
+            $monto = new kushki\lib\Amount( $taxes['subtotalIva'], $taxes['iva'], $taxes['subtotalIva0'], $taxes['extraTaxes'] );
+        }
+        if($countryCode == 'US'){
+            $monto = new kushki\lib\Amount( $taxes['subtotalIva'], $taxes['iva'], $taxes['subtotalIva0'], $taxes['ice'] );
+        }
 
 		if ( $meses > 0 ) {
 			$transaccion = $kushki->deferredCharge( $token, $monto, $meses);
 		} else {
-			$transaccion = $kushki->charge( $token, $monto, $orderItems);
+			$transaccion = $kushki->charge( $token, $monto);
 		}
 		if ( $this->getRequest()->get( "orderId" ) && $transaccion->isSuccessful() ) {
 			$arr_querystring = array(
@@ -119,5 +117,83 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
             $cont++;
         }
         return $arrResp;
+
+    }
+
+    public function getTaxAmount($productTaxes, $orderId)
+    {
+        $tax_iva = Mage::getStoreConfig('payment/kushkipayment/taxiva');
+
+
+        $tax_ice = Mage::getStoreConfig('payment/kushkipayment/taxice');
+        $tax_propina = Mage::getStoreConfig('payment/kushkipayment/taxpropina');
+        $tax_tasa_aeroportuaria = Mage::getStoreConfig('payment/kushkipayment/taxaeroportuaria');
+        $tax_agencia_viaje = Mage::getStoreConfig('payment/kushkipayment/taxagenciadeviaje');
+        $tax_iac = Mage::getStoreConfig('payment/kushkipayment/taxiac');
+
+        $subtotalIva = 0;
+        $subtotalIva0 = 0;
+        $iva = 0;
+        $ice = 0;
+        $propina = null;
+        $tasaAeroportuaria = null;
+        $agenciaDeViaje = null;
+        $iac = null;
+        $i = 0;
+
+        $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
+        $countryId = $order->getShippingAddress()->getData()['country_id'];
+        foreach($productTaxes as $product){
+            $totalAmount = $product['price'];
+            $taxExcempt = true;
+            foreach($product['tax'] as $tax){
+                $taxCalculation = Mage::getModel('tax/calculation_rate')->getCollection()
+                    ->addFieldToFilter('tax_country_id', $countryId)
+                    ->addFieldToFilter('tax_calculation_rate_id', $tax[$i])->getData();
+                if($taxCalculation != null && $taxCalculation[0]['code'] != null) {
+                    $percentage = $taxCalculation[0]['rate'];
+                    $taxName = $taxCalculation[0]['code'];
+                    switch ($taxName) {
+                        case $tax_iva:
+                            $iva += (($totalAmount * $percentage) / 100) * $product['quantity'];
+                            $subtotalIva += $totalAmount * $product['quantity'];
+                            $taxExcempt = false;
+                            break;
+                        case $tax_ice:
+                            $ice += $totalAmount * $percentage * $product->quantity;
+                            break;
+                        case $tax_propina:
+                            $propina += $totalAmount * $percentage * $product->quantity;
+                            break;
+                        case $tax_tasa_aeroportuaria:
+                            $tasaAeroportuaria += $totalAmount * $percentage * $product->quantity;
+                            break;
+                        case $tax_agencia_viaje:
+                            $agenciaDeViaje += $totalAmount * $percentage * $product->quantity;
+                            break;
+                        case $tax_iac:
+                            $iac += $totalAmount * $percentage * $product->quantity;
+                            break;
+                    }
+                }
+                $i ++;
+            }
+            if ($taxExcempt){
+                $subtotalIva0 += $totalAmount * $product->quantity;
+            }
+        }
+        $amount = [
+            'subtotalIva' => $subtotalIva,
+            'subtotalIva0' => $subtotalIva0,
+            'iva' => $iva,
+            'ice' => $ice,
+            'extraTaxes' => [
+                'propina' => $propina,
+                'tasaAeroportuaria' => $tasaAeroportuaria,
+                'agenciaDeViaje' => $agenciaDeViaje,
+                'iac' => $iac
+            ]
+        ];
+        return $amount;
     }
 }
