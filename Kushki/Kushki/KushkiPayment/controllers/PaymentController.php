@@ -15,11 +15,18 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
         $orderItems = $this->getProducts();
         $countryCode = Mage::getStoreConfig('general/country/default');
         $orderId = $this->getRequest()->get( "orderId" );
-        $order = Mage::getModel('sales/order')->load($orderId, 'increment_id');
+        $order = Mage::getModel('sales/order')->load($orderId, 'increment_id')->getData();
         $taxCalculation = $this->getTaxDetails();
 		$taxes = $this->getTaxAmount($taxCalculation, $orderId);
 		$kushki = new kushki\lib\Kushki( $merchantId, $idioma, $moneda, $entorno );
 
+		if ( (float)$order['base_shipping_tax_amount'] > 0 ){
+            $taxes['subtotalIva'] += (float)$order['base_shipping_amount'];
+            $taxes['iva'] += (float)$order['base_shipping_tax_amount'];
+        }
+        else{
+		    $taxes['subtotalIva0'] += (float)$order['base_shipping_amount'];
+        }
 		$token        = $this->getRequest()->get( "kushkiToken" );
 		$meses        = $this->getRequest()->get( "kushkiDeferred" );
 //		$subtotalIva  = round( $subtotalIva, 2 );
@@ -41,7 +48,7 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
 		} else {
 			$transaccion = $kushki->charge( $token, $monto);
             //TODO[@pmoreanoj] uncomment when metadata is getting decrypted in Aurus
-            //$transaccion = $kushki->charge( $token, $monto, $order->getData());
+            //$transaccion = $kushki->charge( $token, $monto, $order);
 		}
 		if ( $this->getRequest()->get( "orderId" ) && $transaccion->isSuccessful() ) {
 			$arr_querystring = array(
