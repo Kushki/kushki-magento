@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.002087">
+    <testsuite name="Kushki-Library" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.002087">
+      <testsuite name="kushki\Kushk\Kushki\KushkiPayment\tests\lib\unit\PaymentControllerKushkiTest" file="/Users/david/Documents/Kushki/kushki-magento/Kushki/Kushki/KushkiPayment/tests/unit/PaymentControllerKushkiTest.php" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.002087">
+        <testcase name="testGetTaxDetails" class="kushki\Kushk\Kushki\KushkiPayment\tests\lib\unit\PaymentControllerKushkiTest" file="/Users/david/Documents/Kushki/kushki-magento/Kushki/Kushki/KushkiPayment/tests/unit/PaymentControllerKushkiTest.php" line="30" assertions="1" time="0.001435"/>
+        <testcase name="testGetProducts" class="kushki\Kushk\Kushki\KushkiPayment\tests\lib\unit\PaymentControllerKushkiTest" file="/Users/david/Documents/Kushki/kushki-magento/Kushki/Kushki/KushkiPayment/tests/unit/PaymentControllerKushkiTest.php" line="38" assertions="1" time="0.000347"/>
+        <testcase name="testGetTaxAmount" class="kushki\Kushk\Kushki\KushkiPayment\tests\lib\unit\PaymentControllerKushkiTest" file="/Users/david/Documents/Kushki/kushki-magento/Kushki/Kushki/KushkiPayment/tests/unit/PaymentControllerKushkiTest.php" line="46" assertions="1" time="0.000305"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -5,20 +5,30 @@
  * Date: 10/24/17
  * Time: 5:02 PM
  */
-
+namespace kushki\Kushk\Kushki\KushkiPayment\tests\lib\unit;
+use kushki\Kushk\Kushki\KushkiPayment\tests\lib\Utils;
 use PHPUnit\Framework\TestCase;
+use PaymentControllerKushki;
+require_once __DIR__ . '/../lib/Utils.php';
 
-class PaymentControllerKushkiTest extends PHPUnit\Framework\TestCase
+class PaymentControllerKushkiTest extends TestCase
 {
-    public function testGetTaxDetails() {
-        $expectedResult = array(
+    private $taxDetails;
+
+    public function __construct()
+    {
+        $this->taxDetails =  array(
             [
-                'productId' => '1',
-                'price' => '280',
-                'totalTax' => '12',
+                'productId' => Utils::randomNumberString(1, 5),
+                'price' => Utils::randomNumberString(1, 5),
+                'totalTax' => Utils::randomNumberString(1, 2),
                 'quantity' => '1',
-                'tax' => ['4', '6']
+                'tax' => [Utils::randomNumberString(1, 2), Utils::randomNumberString(1, 2)]
             ]);
+    }
+
+    public function testGetTaxDetails() {
+        $expectedResult = $this->taxDetails;
         $stub = $this->createMock(PaymentControllerKushki::class);
         $stub->method('getTaxDetails')
             ->willReturn($expectedResult);
@@ -34,24 +44,17 @@ class PaymentControllerKushkiTest extends PHPUnit\Framework\TestCase
     }
 
     public function testGetTaxAmount(){
-        $taxDetails = array(
-            [
-                'productId' => '1',
-                'price' => '280',
-                'totalTax' => '12',
-                'quantity' => '1',
-                'tax' => ['4', '6']
-            ]);
+        $taxDetails = $this->taxDetails;
         $amount = [
-            'subtotalIva' => 0,
-            'subtotalIva0' => 0,
-            'iva' => 0,
-            'ice' => 0,
+            'subtotalIva' => Utils::getRandomDouble(0, 2),
+            'subtotalIva0' => Utils::getRandomDouble(0, 2),
+            'iva' => Utils::getRandomDouble(0, 2),
+            'ice' => Utils::getRandomDouble(0, 2),
             'extraTaxes' => [
-                'propina' => 0,
-                'tasaAeroportuaria' => 0,
-                'agenciaDeViaje' => 0,
-                'iac' => 0
+                'propina' => Utils::getRandomDouble(0, 2),
+                'tasaAeroportuaria' => Utils::getRandomDouble(0, 2),
+                'agenciaDeViaje' => Utils::getRandomDouble(0, 2),
+                'iac' => Utils::getRandomDouble(0, 2)
             ]
         ];
         $stub = $this->createMock(PaymentControllerKushki::class);
