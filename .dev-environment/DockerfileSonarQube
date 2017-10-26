@@ -1,4 +1,4 @@
-FROM andresmartinez/magento1.9
+FROM kushki-local/basemagento1.9
 RUN apt-get install -yq unzip phpunit
 RUN  curl --insecure -o /opt/sonarscanner.zip -L https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.0.3.778-linux.zip && \
      unzip /opt/sonarscanner.zip -d /opt && rm /opt/sonarscanner.zip

@@ -1,5 +1,5 @@
 web:
-  image: kushki/magento1.9
+  image:  kushki-local/basemagento1.9
   ports:
     - "80:80"
   links:
