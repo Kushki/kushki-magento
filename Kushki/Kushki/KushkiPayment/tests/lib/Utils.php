@@ -5,6 +5,7 @@
  * Date: 10/24/17
  * Time: 5:48 PM
  */
+namespace kushki\Kushk\Kushki\KushkiPayment\tests\lib;
 
 class Utils {
 
@@ -59,3 +60,4 @@ class Utils {
     }
 
 }
+use kushki\lib\Kushki;
