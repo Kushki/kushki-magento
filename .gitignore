@@ -1,8 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
-
+.env
 /.DS_Store
-/dev-environment/sampledata/magento-sample-data-1.9.2.4.tar.gz
+/.dev-environment/sampledata/magento-sample-data-1.9.2.4.tar.gz
 /Kushki/Kushki/KushkiPayment/vendor/
 /Kushki/Kushki/KushkiPayment/vendor/kushki/kushki-php/
 /Kushki/Kushki/KushkiPayment/vendor/kushki/kushki-php/lib/
@@ -43,4 +43,4 @@
 /Kushki/Kushki/KushkiPayment/vendor/kushki/kushki-php/lib/KushkiSubscriptionRequest.php
 /Kushki/Kushki/KushkiPayment/vendor/kushki/kushki-php/lib/Tax.php
 /Kushki/Kushki/KushkiPayment/vendor/kushki/kushki-php/lib/KushkiVoidRequest.php
-/dev-environment/.DS_Store
+/.dev-environment/.DS_Store
