@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b4f2e600177d808cdccc943e5b7825c4",
+    "content-hash": "f68413756a66ba04dea8bfd8adb98535",
     "packages": [
         {
             "name": "kushki/kushki-php",
