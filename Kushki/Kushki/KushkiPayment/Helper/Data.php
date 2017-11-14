@@ -1,6 +1,6 @@
 <?php
 
-class Kushki_KushkiPayment_Helper_Data extends Mage_Core_Helper_Abstract
+class Kushki_kushkipayment_helper_data extends Mage_Core_Helper_Abstract
 {
   function getPaymentGatewayUrl() 
   {
