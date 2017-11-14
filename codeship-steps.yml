@@ -1,0 +1,11 @@
+- type: serial
+  steps:
+    - name: build
+      service: kushkimagento
+      command: /opt/pipeline/01-install.sh
+    - name: unit
+      service: kushkimagento
+      command: /opt/pipeline/02-unit.sh
+    - name: integration
+      service: kushkimagento
+      command: /opt/pipeline/03-integration.sh
