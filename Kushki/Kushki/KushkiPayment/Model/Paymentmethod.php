@@ -1,5 +1,5 @@
 <?php
-class Kushki_KushkiPayment_Model_Paymentmethod extends Mage_Payment_Model_Method_Abstract {
+class Kushki_kushkipayment_model_paymentmethod extends Mage_Payment_Model_Method_Abstract {
   protected $_code  = 'kushkipayment';
   protected $_formBlockType = 'kushkipayment/form_kushkipayment';
   protected $_infoBlockType = 'kushkipayment/info_kushkipayment';
