@@ -62,7 +62,69 @@
               <show_in_website>1</show_in_website>
               <show_in_store>0</show_in_store>
               <sort_order>6</sort_order>
-            </commerceprivate>         
+            </commerceprivate>
+            <taxSettings translate="label">
+              <label>Tax Settings</label>
+              <frontend_type>label</frontend_type>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+              <comment>Set the current defined name for each tax on the Magento Tax Settings.</comment>
+              <sort_order>7</sort_order>
+            </taxSettings>
+            <taxiva translate="label">
+              <label>IVA</label>
+              <frontend_type>text</frontend_type>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+              <sort_order>8</sort_order>
+            </taxiva>
+            <taxice translate="label">
+              <label>ICE</label>
+              <frontend_type>text</frontend_type>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+              <sort_order>9</sort_order>
+              <tooltip>Just apply to Ecuador</tooltip>
+            </taxice>
+            <taxpropina translate="label">
+              <label>PROPINA</label>
+              <frontend_type>text</frontend_type>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+              <sort_order>10</sort_order>
+              <tooltip>Just apply to Colombia</tooltip>
+            </taxpropina>
+            <taxaeroportuaria translate="label">
+              <label>TASA AEROPORTUARIA</label>
+              <frontend_type>text</frontend_type>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+              <sort_order>11</sort_order>
+              <tooltip>Just apply to Colombia</tooltip>
+            </taxaeroportuaria>
+            <taxagenciadeviaje translate="label">
+              <label>AGENCIA DE VIAJE</label>
+              <frontend_type>text</frontend_type>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+              <sort_order>12</sort_order>
+              <tooltip>Just apply to Colombia</tooltip>
+            </taxagenciadeviaje>
+            <taxiac translate="label">
+              <label>IAC</label>
+              <frontend_type>text</frontend_type>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>0</show_in_store>
+              <sort_order>13</sort_order>
+              <tooltip>Just apply to Colombia</tooltip>
+            </taxiac>
           </fields>
         </kushkipayment>
       </groups>
