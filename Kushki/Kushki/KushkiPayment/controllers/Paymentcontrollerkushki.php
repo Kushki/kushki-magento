@@ -6,7 +6,7 @@
  * Time: 3:06 PM
  */
 
-class PaymentControllerKushki
+class Paymentcontrollerkushki
 {
     public function __construct($orderId, $order, $tax_iva, $tax_ice, $tax_propina, $tax_tasa_aeroportuaria, $tax_agencia_viaje, $tax_iac)
     {
