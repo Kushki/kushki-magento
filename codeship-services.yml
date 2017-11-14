@@ -1,0 +1,16 @@
+kushkimagento:
+  build:
+    image: kushki/magento1.9
+    dockerfile: .dev-environment/DockerfileSonarQube
+#  cached: true
+  links:
+    - magentomysql
+  env_file:
+    - .dev-environment/env
+  encrypted_env_file:
+    - .env.encrypted
+magentomysql:
+  image: mysql:5.6.23
+#  cached: true
+  env_file:
+    - .dev-environment/env
