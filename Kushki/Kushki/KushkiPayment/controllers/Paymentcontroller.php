@@ -1,9 +1,9 @@
 <?php
 
-include_once 'PaymentControllerKushki.php';
+include_once 'Paymentcontrollerkushki.php';
 use kushki\lib\ExtraTaxes;
 
-class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_Action {
+class Kushki_kushkipayment_paymentcontroller extends Mage_Core_Controller_Front_Action {
 	public function gatewayAction() {
 		$merchantId = Mage::helper( 'core' )->decrypt( Mage::getStoreConfig( 'payment/kushkipayment/commerceprivate' ) );
 		$idioma     = kushki\lib\KushkiLanguage::ES;
@@ -23,7 +23,7 @@ class Kushki_KushkiPayment_PaymentController extends Mage_Core_Controller_Front_
         $countryCode = Mage::getStoreConfig('general/country/default');
         $orderId = $this->getRequest()->get( "orderId" );
         $order = Mage::getModel('sales/order')->load($orderId, 'increment_id');
-        $kushkiPaymentController = new PaymentControllerKushki($orderId, $order, $tax_iva, $tax_ice, $tax_propina, $tax_tasa_aeroportuaria, $tax_agencia_viaje, $tax_iac);
+        $kushkiPaymentController = new Paymentcontrollerkushki($orderId, $order, $tax_iva, $tax_ice, $tax_propina, $tax_tasa_aeroportuaria, $tax_agencia_viaje, $tax_iac);
         $taxCalculation = $kushkiPaymentController->getTaxDetails();
         //$taxCalculation = $this->getTaxDetails();
         $taxes = $kushkiPaymentController->getTaxAmount($taxCalculation, $orderId);
