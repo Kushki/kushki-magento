@@ -1,6 +1,6 @@
 <?php
 
-class Kushki_kushkipayment_block_info_kushkipayment extends Mage_Payment_Block_Info
+class Kushki_KushkiPayment_Block_Info_KushkiPayment extends Mage_Payment_Block_Info
 {
   protected function _prepareSpecificInformation($transport = null)
   {
