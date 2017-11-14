@@ -1,6 +1,6 @@
 <?php
 
-class Kushki_kushkipayment_block_form_kushkipayment extends Mage_Payment_Block_Form
+class Kushki_KushkiPayment_Block_Form_KushkiPayment extends Mage_Payment_Block_Form
 {
   protected function _construct()
   {
