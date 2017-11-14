@@ -10,7 +10,7 @@ namespace kushki\Kushk\Kushki\KushkiPayment\tests\lib\unit;
 
 use kushki\Kushk\Kushki\KushkiPayment\tests\lib\Utils;
 
-use PaymentControllerKushki;
+use Paymentcontrollerkushki;
 use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../lib/Utils.php';
@@ -34,7 +34,7 @@ class PaymentControllerKushkiTest extends PHPUnit_Framework_TestCase
     public function testGetTaxDetails()
     {
         $expectedResult = $this->taxDetails;
-        $stub = $this->createMock(PaymentControllerKushki::class);
+        $stub = $this->createMock(Paymentcontrollerkushki::class);
         $stub->method('getTaxDetails')
             ->willReturn($expectedResult);
         $this->assertEquals($expectedResult, $stub->getTaxDetails(), 'Tax details not equal');
@@ -43,7 +43,7 @@ class PaymentControllerKushkiTest extends PHPUnit_Framework_TestCase
     public function testGetProducts()
     {
         $expectedResult = array(['producto1'], ['producto2'], ['producto3']);
-        $stub = $this->createMock(PaymentControllerKushki::class);
+        $stub = $this->createMock(Paymentcontrollerkushki::class);
         $stub->method('getProducts')
             ->willReturn($expectedResult);
         $this->assertEquals($expectedResult, $stub->getProducts(), 'Products not equal');
@@ -64,7 +64,7 @@ class PaymentControllerKushkiTest extends PHPUnit_Framework_TestCase
                 'iac' => Utils::getRandomDouble(0, 2)
             ]
         ];
-        $stub = $this->createMock(PaymentControllerKushki::class);
+        $stub = $this->createMock(Paymentcontrollerkushki::class);
         $stub->method('getTaxAmount')
             ->willReturn($amount);
         $this->assertEquals($amount, $stub->getTaxAmount($taxDetails), 'Amount not equal');
