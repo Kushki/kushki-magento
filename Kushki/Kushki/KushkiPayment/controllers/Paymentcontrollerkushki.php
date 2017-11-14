@@ -6,11 +6,7 @@
  * Time: 3:06 PM
  */
 
-<<<<<<< HEAD
 class PaymentControllerKushki
-=======
-class Paymentcontrollerkushki
->>>>>>> [KV-0] New version
 {
     public function __construct($orderId, $order, $tax_iva, $tax_ice, $tax_propina, $tax_tasa_aeroportuaria, $tax_agencia_viaje, $tax_iac)
     {
