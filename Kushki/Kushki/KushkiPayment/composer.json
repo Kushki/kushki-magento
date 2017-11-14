@@ -7,6 +7,13 @@
         }
     ],
     "require": {
-    	"kushki/kushki-php": "^1.0.0"
+    	"kushki/kushki-php": "^1.2.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8",
+        "phpunit/php-code-coverage": "^2.1"
+    },
+    "autoload": {
+        "psr-0": { "": "lib/" }
     }
 }
