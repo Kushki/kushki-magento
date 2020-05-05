@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <kushki_pay>                
+                <title>Kushki Payment</title>
+                <model>Kushki\Payment\Model\KushkiPay</model>
+                <debug>0</debug>
+                <mode>1</mode>
+                <payment_action>authorize_capture</payment_action>
+                <active>1</active>                
+                <sort_order>1</sort_order>
+                <allowspecific>0</allowspecific>
+            </kushki_pay>
+        </payment>
+    </default>
+</config>
+
