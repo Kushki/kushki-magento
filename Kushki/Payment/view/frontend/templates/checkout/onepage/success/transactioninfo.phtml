@@ -1,0 +1,11 @@
+<?php
+$ticketnumber = $block->getTicketNumber();
+?>
+<?php if($ticketnumber != ''):?>
+<p class="order-number">
+	<?php echo __('Kushki Ticket No.') ?>: <span><b><?php echo $ticketnumber?></b></span>
+</p>
+<p class="order-number">
+	<?php echo __('Transaction Date') ?>: <span><b><?php echo $block->getTransactionDate() ?></b></span>
+</p>
+<?php endif;?>
