@@ -456,7 +456,11 @@ class KushkiPay extends  \Magento\Payment\Model\Method\AbstractMethod {
 			"iva" => 0,
 			"currency" => $order->getOrderCurrencyCode(),
 		];
-		if($info->getAdditionalInformation('kushki_deffered') || $info->getAdditionalInformation('kushki_deffered_type') || $info->getAdditionalInformation('kushki_months_of_grace'))
+
+        $request['contactDetails'] = [];
+        $request['contactDetails']['email'] = $order->getCustomerEmail();
+
+        if($info->getAdditionalInformation('kushki_deffered') || $info->getAdditionalInformation('kushki_deffered_type') || $info->getAdditionalInformation('kushki_months_of_grace'))
 		{
 			$request['deferred'] = [];
 			if($info->getAdditionalInformation('kushki_deffered') ){
