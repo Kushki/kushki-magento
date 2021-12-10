@@ -82,25 +82,59 @@ define([
                 if (!customer.isLoggedIn()) {
                      $('#kushki_guest_email').val(quote.guestEmail);
                 }
-                console.log({
-                    form: "kushki_pay-form",
-                    merchant_id: window.checkoutConfig.payment.kushki_pay.merchant_id,
-                    amount: quote.totals()['base_grand_total'],
-                    currency: quote.totals()['base_currency_code'],
-                    payment_methods:["credit-card"], // Payments Methods enabled
-                    is_subscription: false, // Optional
-                    inTestEnvironment: window.checkoutConfig.payment.kushki_pay.mode, 
-                    regional:false // Optional
+                // console.log({
+                //     form: "kushki_pay-form",
+                //     merchant_id: window.checkoutConfig.payment.kushki_pay.merchant_id,
+                //     callback_url: window.checkoutConfig.payment.kushki_pay.callback_url,
+                //     amount: {
+                //         subtotalIva: quote.totals()['base_subtotal'] + quote.totals()['base_shipping_amount'] ,
+                //         subtotalIva0: 0,
+                //         ice: 0,
+                //         iva: quote.totals()['tax_amount']
+                //     },
+                //     currency: quote.totals()['base_currency_code'],
+                //     payment_methods:["credit-card"], // Payments Methods enabled
+                //     is_subscription: false, // Optional
+                //     inTestEnvironment: window.checkoutConfig.payment.kushki_pay.mode,
+                //     regional:false // Optional
+                // });
+
+                var subtotalIva = 0;
+                var subtotalIva0 = 0;
+                var iva = 0;
+                var products = quote.totals()['items'];
+                products.forEach((item) => {
+                    if (item['tax_amount'] !== 0 || item['tax_percent'] !== 0) {
+                        subtotalIva += item['row_total'];
+                        iva += item['tax_amount'];
+                    } else {
+                        subtotalIva0 += item['row_total'];
+                    }
                 });
+
+                var shippingTax = quote.totals()['shipping_tax_amount'];
+                if (shippingTax > 0) {
+                    subtotalIva += quote.totals()['shipping_amount'];
+                    iva += shippingTax;
+                } else {
+                    subtotalIva0 += quote.totals()['shipping_amount'];
+                }
+
                 var kushki = new KushkiCheckout({
+                    kformId: "MAGENTO",
                     form: "kushki_pay-form",
-                    merchant_id: window.checkoutConfig.payment.kushki_pay.merchant_id,
-                    amount: quote.totals()['base_grand_total'],
+                    publicMerchantId: window.checkoutConfig.payment.kushki_pay.merchant_id,
+                    callback_url: window.checkoutConfig.payment.kushki_pay.callback_url,
+                    amount: {
+                        subtotalIva: subtotalIva,
+                        subtotalIva0: subtotalIva0,
+                        ice: 0,
+                        iva: iva,
+                    },
                     currency: quote.totals()['base_currency_code'],
-                    payment_methods:["credit-card"], // Payments Methods enabled
-                    is_subscription: false, // Optional
-                    inTestEnvironment: window.checkoutConfig.payment.kushki_pay.mode, 
-                    regional:false // Optional
+                    inTestEnvironment: window.checkoutConfig.payment.kushki_pay.mode,
+                    regional:false, // Optional
+                    heightOffset: 20 // Optional
                 });
 
             },

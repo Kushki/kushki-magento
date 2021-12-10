@@ -1,11 +1,28 @@
 <?php
 $ticketnumber = $block->getTicketNumber();
+$url = $block->getCashUrl();
+$transactionReference = $block->getTransactionReference();
 ?>
 <?php if($ticketnumber != ''):?>
 <p class="order-number">
 	<?php echo __('Kushki Ticket No.') ?>: <span><b><?php echo $ticketnumber?></b></span>
 </p>
-<p class="order-number">
-	<?php echo __('Transaction Date') ?>: <span><b><?php echo $block->getTransactionDate() ?></b></span>
-</p>
+    <?php if($block->getTransactionDate() != ''):?>
+        <p class="order-number">
+            <?php echo __('Transaction Date') ?>: <span><b><?php echo $block->getTransactionDate() ?></b></span>
+        </p>
+    <?php endif;?>
+<?php if($url != ''):?>
+        <p class="order-number">
+            <?php echo __('Purchase order') ?>: <a href="<?= $url; ?>" target="_blank"><b><?php echo $url?></b></a>
+        </p>
+    <?php endif;?>
 <?php endif;?>
+<?php if($transactionReference != ''):?>
+    <p class="order-number">
+        <?php echo __('Transaction reference No.') ?>:  <span><b><?php echo $transactionReference?></b></span>
+    </p>
+<?php endif;?>
+<?php
+echo $block->clearCart();
+?>
