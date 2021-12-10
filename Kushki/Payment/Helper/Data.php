@@ -23,6 +23,8 @@ class Data extends AbstractHelper {
 
 	const TEST_MODE_API_URL = 'https://api-uat.kushkipagos.com/card/v1/';
 	const API_URL = 'https://api.kushkipagos.com/card/v1/';
+	const PLUGIN_URL = 'https://api.kushkipagos.com/plugin/v1/';
+    const TEST_PLUGIN_URL = 'https://api-uat.kushkipagos.com/plugins/v1/';
 
 	/**
 	 * @var AdminSession
@@ -98,7 +100,7 @@ class Data extends AbstractHelper {
         );
     }
 
-    public function getAPiUrl()
+    public function getCardAPiUrl()
 	{
 		if((boolean) $this->getConfig(self::XML_PATH_KUSHKI_MODE))
 		{
@@ -106,5 +108,13 @@ class Data extends AbstractHelper {
 		}	
 		return self::API_URL;
 	}
+
+	public function getPluginApiUrl() {
+        if((boolean) $this->getConfig(self::XML_PATH_KUSHKI_MODE))
+        {
+            return self::TEST_PLUGIN_URL;
+        }
+        return self::PLUGIN_URL;
+    }
 
 }
