@@ -9,6 +9,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 use kushki\lib\Kushki;
+use Magento\Sales\Api\OrderRepositoryInterface;
 
 class Confirm extends \Magento\Framework\App\Action\Action
 {
@@ -61,7 +62,13 @@ class Confirm extends \Magento\Framework\App\Action\Action
         \Magento\Checkout\Api\PaymentInformationManagementInterface $paymentInformationManagement,
         \Magento\Checkout\Api\GuestPaymentInformationManagementInterface $guestPaymentInformationManagement,
         \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
-        \Magento\Quote\Api\Data\AddressInterface $address
+        \Magento\Quote\Api\Data\AddressInterface $address,
+        \Magento\Sales\Model\OrderFactory $orderFactory,
+        OrderRepositoryInterface $orderRepository,
+        \Magento\Sales\Model\Service\InvoiceService $invoiceService,
+        \Magento\Framework\DB\TransactionFactory $transactionFactory,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender
     ) {
     	$this->formKeyValidator = $formKeyValidator;
         $this->checkoutSession = $checkoutSession;
@@ -71,6 +78,12 @@ class Confirm extends \Magento\Framework\App\Action\Action
         $this->paymentMethod = $paymentMethod;
         $this->address = $address;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
+        $this->orderFactory = $orderFactory;
+        $this->_orderRepository = $orderRepository;
+        $this->invoiceService = $invoiceService;
+        $this->transactionFactory = $transactionFactory;
+        $this->messageManager = $messageManager;
+        $this->invoiceSender = $invoiceSender;
         parent::__construct($context);
 
     }
@@ -115,6 +128,12 @@ class Confirm extends \Magento\Framework\App\Action\Action
                 {
                     $additionalData['kushki_months_of_grace']=$this->getRequest()->getParam('kushkiMonthsOfGrace');
                 }
+
+                if($this->getRequest()->getParam('kushkiPaymentMethod'))
+                {
+                    $additionalData['kushki_payment_method'] = $this->getRequest()->getParam('kushkiPaymentMethod');
+                }
+
                 $this->paymentMethod->setAdditionalData($additionalData);
 
                 $this->address->setData(json_decode($this->getRequest()->getParam('billing_address'),true));
@@ -139,9 +158,22 @@ class Confirm extends \Magento\Framework\App\Action\Action
                         $this->paymentMethod,
                         $this->address
                     );
+
                 }
+
                 if($orderId)
                 {
+                    if ($this->getRequest()->getParam('kushkiPaymentMethod') == "card") {
+                        $this->generateCaptureInvoice($orderId);
+                    } else {
+                        $state = \Magento\Sales\Model\Order::STATE_NEW;
+                        $this->_setOrderStatus($orderId, "pending", $state);
+                    }
+                    if( $this->getRequest()->getParam('kushkiPaymentMethod') == "transfer" || $this->getRequest()->getParam('kushkiPaymentMethod') == "card_async" ){
+                        $order = $this->orderFactory->create()->load($orderId);
+                        $payment = $order->getPayment();
+                        return $resultRedirect->setUrl($payment->getAdditionalInformation('redirectUrl'));
+                    }
                     return $resultRedirect->setPath('checkout/onepage/success/');
                 }
 
@@ -155,5 +187,67 @@ class Confirm extends \Magento\Framework\App\Action\Action
         $this->messageManager->addWarningMessage(__('Something went wrong while creating order'));
         return $resultRedirect->setPath('checkout');
 
+    }
+
+    private function _setOrderStatus($orderId, $status, $state): bool
+    {
+        try{
+            $order = $this->orderFactory->create()->load($orderId);
+            $order
+                ->setState($state, true)
+                ->setStatus($status, true)
+                ->addStatusToHistory($status, "Kushki payment is " . $status);
+            $this->_orderRepository->save($order);
+            return true;
+        } catch (\Exception $e){
+            return false;
+        }
+    }
+
+    public function generateCaptureInvoice($orderId){
+        try {
+            $order = $this->_orderRepository->get($orderId);
+
+            if (!$order->getId()) {
+                throw new \Magento\Framework\Exception\LocalizedException(__('The order no longer exists.'));
+            }
+            if(!$order->canInvoice()) {
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('The order does not allow an invoice to be created.')
+                );
+            }
+
+            $invoice = $this->invoiceService->prepareInvoice($order);
+            if (!$invoice) {
+                throw new \Magento\Framework\Exception\LocalizedException(__('We can\'t save the invoice right now.'));
+            }
+            if (!$invoice->getTotalQty()) {
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('You can\'t create an invoice without products.')
+                );
+            }
+            $payment = $order->getPayment();
+            $paymentId = $payment->getTransactionId();
+            $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
+            $invoice->setTransactionId($paymentId);
+            $invoice->register();
+            $invoice->getOrder()->setCustomerNoteNotify(false);
+            $invoice->getOrder()->setIsInProcess(true);
+            $order->addStatusHistoryComment('Kushki payment completed and automatically invoiced.', false);
+            $transactionSave = $this->transactionFactory->create()->addObject($invoice)->addObject($invoice->getOrder());
+            $transactionSave->save();
+            $payment->capture($invoice);
+            $this->_orderRepository->save($order);
+
+            // send invoice emails, If you want to stop mail comment below try/catch code
+            try {
+                $this->invoiceSender->send($invoice);
+            } catch (\Exception $e) {
+                $this->messageManager->addError(__('We can\'t send the invoice email right now.'));
+            }
+        } catch (\Exception $e) {
+
+            $this->messageManager->addError($e->getMessage());
+        }
     }
 }
