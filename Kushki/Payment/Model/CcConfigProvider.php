@@ -43,6 +43,7 @@ class CcConfigProvider implements ConfigProviderInterface
      * @var \Magento\Framework\UrlInterface
      */
     protected $coreUrl;
+    protected $_storeManager;
 
     /**
      * @param PaymentHelper                   $paymentHelper  
@@ -59,6 +60,7 @@ class CcConfigProvider implements ConfigProviderInterface
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\Data\Form\FormKey $formKey,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         Escaper $escaper,
         EncryptorInterface $enc
     ) {
@@ -70,6 +72,7 @@ class CcConfigProvider implements ConfigProviderInterface
         $this->method = $paymentHelper->getMethodInstance($this->methodCode);
         $this->_enc = $enc;
          $this->formKey = $formKey;
+        $this->_storeManager = $storeManager;
     }
 
     /**
@@ -84,7 +87,8 @@ class CcConfigProvider implements ConfigProviderInterface
                 'kushki_pay' => [
                     'merchant_id'=>$this->_enc->decrypt($this->kushkiHelper->getConfig(\Kushki\Payment\Helper\Data::XML_PATH_KUSHKI_PUBLIC_MERCHANT_ID)),
                     'mode' => (boolean)$this->kushkiHelper->getConfig(\Kushki\Payment\Helper\Data::XML_PATH_KUSHKI_MODE),                    
-                    'form_key'=>$this->formKey->getFormKey()
+                    'form_key'=>$this->formKey->getFormKey(),
+                    'callback_url'=> $this->_storeManager->getStore()->getBaseUrl()."kushki_confirm/payment/async",
                 ]
             ];        
             if($this->checkoutSession->getKushkiErrorMessage() && $this->checkoutSession->getKushkiErrorMessage() !='')

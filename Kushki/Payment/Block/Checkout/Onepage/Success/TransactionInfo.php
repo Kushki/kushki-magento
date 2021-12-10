@@ -64,9 +64,10 @@ class TransactionInfo extends \Magento\Framework\View\Element\Template
             $payment = $order->getPayment();
             if($payment->getMethod() == \Kushki\Payment\Model\KushkiPay::CODE)
             {
-                //$payment->getLastTransId();
-                $info = $payment->getInfoInstance();
                 $ticketNumber = $payment->getAdditionalInformation('capture_ticket_number');
+                if (!$ticketNumber) {
+                    $ticketNumber = $payment->getAdditionalInformation('preauth_ticket_number');
+                }
                 $this->createAt =  $payment->getAdditionalInformation('capture_at');
             }
         }
@@ -74,13 +75,46 @@ class TransactionInfo extends \Magento\Framework\View\Element\Template
 
     }
 
+    public function getCashUrl(){
+        $cashUrl="";
+        $orderId = $this->_checkoutSession->getLastOrderId();
+        $order = $this->orderFactory->create()->load($orderId);
+        $payment = $order->getPayment();
+        if($payment->getMethod() == \Kushki\Payment\Model\KushkiPay::CODE)
+        {
+            $cashUrl = $payment->getAdditionalInformation('cash_pdf');
+        }
+        return $cashUrl;
+    }
+
+    public function getTransactionReference(){
+        $transactionReference="";
+        $orderId = $this->_checkoutSession->getLastOrderId();
+        $order = $this->orderFactory->create()->load($orderId);
+        $payment = $order->getPayment();
+        if($payment->getMethod() == \Kushki\Payment\Model\KushkiPay::CODE)
+        {
+            $transactionReference = $payment->getAdditionalInformation('transactionReference');
+        }
+        return $transactionReference;
+    }
+
     /**
     * @return string
     */
     public function getTransactionDate()
     {
-      $d = substr($this->createAt, 0, -3);
-      return date("F d, Y h:i:s A",(int) $d);
+        if ($this->createAt == "") return "";
+        $d = substr($this->createAt, 0, -3);
+        return date("F d, Y h:i:s A",(int) $d);
 
+    }
+
+    public function clearCart() {
+        return "
+            <script>
+                localStorage.removeItem('mage-cache-storage');
+            </script>
+            ";
     }
 }
