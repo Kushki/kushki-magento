@@ -720,7 +720,7 @@ class KushkiPay extends  \Magento\Payment\Model\Method\AbstractMethod {
         $request['metadata']['plugin'] = 'magento2';
         $request['metadata']["city"] = $order->getBillingAddress()->getCity();
         $request['metadata']["country"] = $order->getBillingAddress()->getCountryId();
-        $request['metadata']["postalCode"] = $order->getBillingAddress()->getPostcode();
+        $request['metadata']["postalCode"] = $order->getBillingAddress()->getPostcode() ?: "";
         $request['metadata']["billingAddressPhone"] = $order->getBillingAddress()->getTelephone();
         $request['metadata']["province"] = $order->getBillingAddress()->getRegion() ?: "NA";
         $request['metadata']["billingAddress"] = $order->getBillingAddress()->getStreet()[0];
@@ -745,7 +745,7 @@ class KushkiPay extends  \Magento\Payment\Model\Method\AbstractMethod {
                 "city" => $order->getBillingAddress()->getCity(),
                 "region" => $order->getBillingAddress()->getRegion() ?: "NA",
                 "country" => $order->getBillingAddress()->getCountryId(),
-                "zipCode" => $order->getBillingAddress()->getPostcode()
+                "zipCode" => $order->getBillingAddress()->getPostcode() ?: ""
             ),
             "shippingDetails" => array(
                 "firstName" => $order->getShippingAddress()->getFirstname(),
@@ -755,7 +755,7 @@ class KushkiPay extends  \Magento\Payment\Model\Method\AbstractMethod {
                 "city" => $order->getShippingAddress()->getCity(),
                 "region" => $order->getShippingAddress()->getRegion() ?: "NA",
                 "country" => $order->getShippingAddress()->getCountryId(),
-                "zipCode" => $order->getShippingAddress()->getPostcode()
+                "zipCode" => $order->getShippingAddress()->getPostcode() ?: ""
             )
         );
 
