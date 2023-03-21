@@ -23,7 +23,7 @@ class Data extends AbstractHelper {
 
 	const TEST_MODE_API_URL = 'https://api-uat.kushkipagos.com/card/v1/';
 	const API_URL = 'https://api.kushkipagos.com/card/v1/';
-	const PLUGIN_URL = 'https://api.kushkipagos.com/plugin/v1/';
+	const PLUGIN_URL = 'https://api.kushkipagos.com/plugins/v1/';
     const TEST_PLUGIN_URL = 'https://api-uat.kushkipagos.com/plugins/v1/';
 
 	/**
