@@ -23,8 +23,8 @@ class Data extends AbstractHelper {
 
 	const TEST_MODE_API_URL = 'https://api-uat.kushkipagos.com/card/v1/';
 	const API_URL = 'https://api.kushkipagos.com/card/v1/';
-	const PLUGIN_URL = 'https://api.kushkipagos.com/plugin/v1/';
-    const TEST_PLUGIN_URL = 'https://api-uat.kushkipagos.com/plugins/v1/';
+	const PLUGIN_URL = 'https://api.kushkipagos.com/plugins/v1/';
+  const TEST_PLUGIN_URL = 'https://api-uat.kushkipagos.com/plugins/v1/';
 
 	/**
 	 * @var AdminSession
@@ -57,12 +57,12 @@ class Data extends AbstractHelper {
 	protected $_cacheTypeList;
 
 	/**
-	 * @param AdminSession         $authSession   
-	 * @param Curl                 $curl          
+	 * @param AdminSession         $authSession
+	 * @param Curl                 $curl
 	 * @param MessageService       $messageService
-	 * @param TimezoneInterface    $date          
-	 * @param WriterInterface      $configWriter  
-	 * @param ScopeConfigInterface $scopeConfig   
+	 * @param TimezoneInterface    $date
+	 * @param WriterInterface      $configWriter
+	 * @param ScopeConfigInterface $scopeConfig
 	 */
 	public function __construct(
     	AdminSession $authSession,
@@ -77,7 +77,7 @@ class Data extends AbstractHelper {
 		$this->_date = $date;
 		$this->_configWriter = $configWriter;
 		$this->scopeConfig = $scopeConfig;
-		$this->_cacheTypeList = $cacheTypeList;		
+		$this->_cacheTypeList = $cacheTypeList;
 	}
 
 	/**
@@ -105,7 +105,7 @@ class Data extends AbstractHelper {
 		if((boolean) $this->getConfig(self::XML_PATH_KUSHKI_MODE))
 		{
 			return self::TEST_MODE_API_URL;
-		}	
+		}
 		return self::API_URL;
 	}
 

@@ -134,7 +134,10 @@ define([
                     currency: quote.totals()['base_currency_code'],
                     inTestEnvironment: window.checkoutConfig.payment.kushki_pay.mode,
                     regional:false, // Optional
-                    heightOffset: 20 // Optional
+                    heightOffset: 20, // Optional
+                    kushkiInfo: {
+                        platformId: "KP009" // MAGENTO
+                    }
                 });
 
             },
